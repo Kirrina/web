@@ -76,6 +76,7 @@ class UserController extends Controller {
                 $_SESSION['user_id'] = $ket_qua['data']['id'];
                 $_SESSION['user_fullname'] = $ket_qua['data']['fullname'];
                 $_SESSION['user_role'] = $ket_qua['data']['role']; 
+                $_SESSION['user_status'] = $ket_qua['data']['status'];
 
                 $_SESSION['user_avatar'] = $ket_qua['data']['avatar'];
 

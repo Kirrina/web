@@ -6,11 +6,11 @@ class HomeController extends Controller {
         $tourModel = $this->model('TourModel');
         
         
-        $allTours = $tourModel->getAllTours();
+        $tours = $tourModel->getAllTours();
         
         
         $this->view('home/index', [
-            'tours' => $allTours,
+            'tours' => $tours,
             'loi_chao' => 'Danh sách Tour du lịch mới nhất'
         ]);
     }
