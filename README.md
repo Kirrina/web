@@ -19,4 +19,4 @@ htdocs/
 Mở phpMyAdmin
 Import file: project.sql
 4. Chạy project
-http://localhost/project
+http://localhost/project/public
