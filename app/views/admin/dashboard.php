@@ -78,6 +78,11 @@
 </head>
 
 <body>
+
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+
     <div class="page-container">
         
         <!-- SIDEBAR -->
@@ -95,10 +100,13 @@
                                 <a href="/Project/public/index.php?url=admin/index"><i class="ti-dashboard"></i><span>Tổng quan</span></a>
                             </li>
                             <li>
+                                <a href="/Project/public/index.php?url=admin/users"><i class="ti-user"></i><span>Quản lý User</span></a>
+                            </li>
+                            <li>
                                 <a href="/Project/public/index.php?url=admin/tours"><i class="ti-package"></i><span>Quản lý Tour</span></a>
                             </li>
                             <li>
-                                <a href="#"><i class="ti-shopping-cart-full"></i><span>Quản lý Đơn hàng</span></a>
+                                <a href="/Project/public/index.php?url=admin/bookings"><i class="ti-shopping-cart-full"></i><span>Quản lý Đơn hàng</span></a>
                             </li>
                             <li>
                                 <a href="/Project/public/index.php" target="_blank"><i class="ti-home"></i><span>Xem Website</span></a>
@@ -163,7 +171,7 @@
                 <!-- 4 THẺ THỐNG KÊ (DỮ LIỆU THẬT) -->
                 <div class="row mt-4">
                     
-                    <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="/Project/public/index.php?url=admin/tours" class="col-lg-3 col-md-6 mb-4">
                         <div class="modern-stat-card">
                             <div class="stat-icon-box" style="background: #eef2ff; color: #4f46e5;">
                                 <i class="ti-package"></i>
@@ -173,9 +181,9 @@
                                 <h2><?= number_format($data['stats']['total_tours']) ?></h2>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="/Project/public/index.php?url=admin/tours" class="col-lg-3 col-md-6 mb-4">
                         <div class="modern-stat-card">
                             <div class="stat-icon-box" style="background: #ecfdf5; color: #10b981;">
                                 <i class="ti-shopping-cart"></i>
@@ -185,7 +193,7 @@
                                 <h2><?= number_format($data['stats']['total_bookings']) ?></h2>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     
                     <div class="col-lg-3 col-md-6 mb-4">
                         <div class="modern-stat-card">

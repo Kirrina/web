@@ -2,99 +2,91 @@
 class UserController extends Controller {
 
     public function index() {
-        
-        if (isset($_SESSION['user_id'])) {
-            header("Location: /Project/public");
-        } 
-        
-        else {
+        if (!isset($_SESSION['user_id'])) {
             header("Location: /Project/public/user/login");
+            exit();
         }
-        exit();
+
+        $userId = $_SESSION['user_id'];
+        $userModel = $this->model('UserModel'); //
+        $adminModel = $this->model('AdminModel'); // Dùng để lấy tour
+
+        $userData = $userModel->getUserById($userId);
+        $userBookings = $adminModel->getUserBookings($userId);
+
+        $this->view('user/dashboard', [
+            'user' => $userData,
+            'bookings' => $userBookings
+        ]);
     }
     
+    // Ghi đè hàm Register
     public function register() {
         $viewData = ['thong_bao' => '', 'loai_thong_bao' => ''];
-
-        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-          
-            $postData = [
-                'fullname' => trim($_POST['fullname']),
-                'email' => trim($_POST['email']),
-                'password' => $_POST['password']
-            ];
+            $fullname = trim($_POST['fullname']);
+            $email = trim($_POST['email']);
+            $password = $_POST['password'];
 
-           
-            $userService = $this->service('UserService');
-            $ket_qua = $userService->register($postData);
-
+            $userModel = $this->model('UserModel');
             
-            if ($ket_qua['status'] == true) {
-                
-                $_SESSION['flash_message'] = "🎉 Tuyệt vời! Bạn đã đăng ký thành công. Xin mời đăng nhập.";
-                $_SESSION['flash_type'] = "success";
-                
-                
-                header("Location: /Project/public/user/login");
-                exit(); 
-            } else {
-                
-                $viewData['thong_bao'] = $ket_qua['message'];
+            if ($userModel->checkEmailExist($email)) {
+                $viewData['thong_bao'] = 'Lỗi: Email này đã được sử dụng!';
                 $viewData['loai_thong_bao'] = 'danger';
+            } else {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                if ($userModel->createUser($fullname, $email, $hashedPassword)) {
+                    $_SESSION['flash_message'] = "🎉 Tuyệt vời! Bạn đã đăng ký thành công. Xin mời đăng nhập.";
+                    $_SESSION['flash_type'] = "success";
+                    header("Location: /Project/public/index.php?url=user/login");
+                    exit(); 
+                } else {
+                    $viewData['thong_bao'] = 'Lỗi: Không thể lưu vào hệ thống!';
+                    $viewData['loai_thong_bao'] = 'danger';
+                }
             }
         }
-
-        
         $this->view('user/register', $viewData);
     }
 
-    
+    // Ghi đè hàm Login
     public function login() {
         $viewData = ['thong_bao' => '', 'loai_thong_bao' => ''];
-
-
         if (isset($_SESSION['flash_message'])) {
-            
             $viewData['thong_bao'] = $_SESSION['flash_message'];
             $viewData['loai_thong_bao'] = $_SESSION['flash_type'];
-            
-            unset($_SESSION['flash_message']);
-            unset($_SESSION['flash_type']);
+            unset($_SESSION['flash_message']); unset($_SESSION['flash_type']);
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $email = trim($_POST['email']);
             $password = $_POST['password'];
+            $userModel = $this->model('UserModel');
+            $user = $userModel->getUserByEmail($email);
 
-            $userService = $this->service('UserService');
-            $ket_qua = $userService->login($email, $password);
-
-            if ($ket_qua['status'] == true) {
-                
-                $_SESSION['user_id'] = $ket_qua['data']['id'];
-                $_SESSION['user_fullname'] = $ket_qua['data']['fullname'];
-                $_SESSION['user_role'] = $ket_qua['data']['role']; 
-                $_SESSION['user_status'] = $ket_qua['data']['status'];
-
-                $_SESSION['user_avatar'] = $ket_qua['data']['avatar'];
-
-               
-                if ($_SESSION['user_role'] === 'admin') {
-                    header("Location: /Project/public/admin");
+            if ($user && password_verify($password, $user['password'])) {
+                if ($user['status'] == 'banned') {
+                    $viewData['thong_bao'] = 'Tài khoản của bạn đã bị khóa!';
+                    $viewData['loai_thong_bao'] = 'danger';
                 } else {
-                    header("Location: /Project/public/");
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_fullname'] = $user['fullname'];
+                    $_SESSION['user_role'] = $user['role']; 
+                    $_SESSION['user_status'] = $user['status'];
+                    $_SESSION['user_avatar'] = $user['avatar'] ?? 'default_avatar.jpg';
+
+                    if ($_SESSION['user_role'] === 'admin') {
+                        header("Location: /Project/public/index.php?url=admin");
+                    } else {
+                        header("Location: /Project/public/");
+                    }
+                    exit();
                 }
-                exit();
             } else {
-                
-                $viewData['thong_bao'] = $ket_qua['message'];
+                $viewData['thong_bao'] = 'Email hoặc mật khẩu không chính xác!';
                 $viewData['loai_thong_bao'] = 'danger';
             }
         }
-
-        
         $this->view('user/login', $viewData);
     }
 
